@@ -1,14 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity >=0.7.0 <0.9.0;
 
-struct attestation_by {
-    uint attestation_ind;
-    address attestee;
-}
-struct attestation_about {
-    uint attestation_ind;
-    address attestor;
-}
 struct prop {
   string key;
   string val;
@@ -27,6 +19,14 @@ struct attestation {
 library Utils {
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
+  }
+  function find_in_addr_array(address[] memory ary, address addy) public pure returns (int) {
+      for(uint i=0; i<ary.length;i++) {
+          if (ary[i] == addy) {
+              return int(i);
+          }
+      }
+      return -1;
   }
 }
 
