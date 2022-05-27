@@ -30,7 +30,7 @@ library Utils {
   }
 }
 
-library Props {
+/*library Props {    //Not using it right now, but I think it will come in handy at some point
   function get_index_from_key(prop[] memory props, string memory key) internal pure returns (int) {
     for (uint i=0;i < props.length; i++) {
       if ( Utils.compareStrings(props[i].key, key)) {
@@ -45,7 +45,7 @@ library Props {
     return props[uint(i)].val;
   }
 
-}
+}*/
 
 library Attestations {
   function get_index_from_handle(attestation[] memory attestations, string memory handle) internal pure returns (int) {

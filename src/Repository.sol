@@ -3,8 +3,7 @@ pragma solidity ^0.8.13;
 import "./Lib.sol";
 
 contract Repository {
-    using Attestations for *;
-    using Props for *;
+    using Attestations for attestation[];
     using Utils for *;
     attestation[] private _attestations;
     mapping (address => mapping(uint => address[])) private _attestations_about;
