@@ -1,0 +1,110 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+    <script src="https://cdn.ethers.io/lib/ethers-5.6.umd.min.js" type="text/javascript"> </script>
+    <script src="zepto.min.js" type="text/javascript"> </script>
+    <script src="qr-scanner.umd.min.js"></script> <!-- https://github.com/nimiq/qr-scanner -->
+    <script type="text/javascript">
+      //Edit this \/
+      const repository_addr="0xA14be8C0AE412C997525d47575289FCE977AC2A3";
+      const repository_abi=[ { "inputs": [ { "internalType": "string", "name": "handle", "type": "string" }, { "internalType": "address", "name": "attestee", "type": "address" } ], "name": "attest", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "int256", "name": "idx", "type": "int256" }, { "internalType": "address", "name": "attestee", "type": "address" } ], "name": "attest", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "attestations", "outputs": [ { "components": [ { "internalType": "string", "name": "handle", "type": "string" }, { "components": [ { "internalType": "string", "name": "key", "type": "string" }, { "internalType": "string", "name": "val", "type": "string" } ], "internalType": "struct prop[]", "name": "props", "type": "tuple[]" }, { "internalType": "address[]", "name": "attestors", "type": "address[]" }, { "internalType": "address[]", "name": "attestees", "type": "address[]" } ], "internalType": "struct attestation[]", "name": "", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestee", "type": "address" } ], "name": "attestations_about", "outputs": [ { "internalType": "uint256[]", "name": "", "type": "uint256[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestor", "type": "address" } ], "name": "attestations_by", "outputs": [ { "internalType": "uint256[]", "name": "", "type": "uint256[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestee", "type": "address" }, { "internalType": "uint256", "name": "attestation_ind", "type": "uint256" } ], "name": "attestors_of", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "handle", "type": "string" }, { "components": [ { "internalType": "string", "name": "key", "type": "string" }, { "internalType": "string", "name": "val", "type": "string" } ], "internalType": "struct prop[]", "name": "props", "type": "tuple[]" } ], "name": "create_attestation", "outputs": [ { "components": [ { "internalType": "string", "name": "handle", "type": "string" }, { "components": [ { "internalType": "string", "name": "key", "type": "string" }, { "internalType": "string", "name": "val", "type": "string" } ], "internalType": "struct prop[]", "name": "props", "type": "tuple[]" }, { "internalType": "address[]", "name": "attestors", "type": "address[]" }, { "internalType": "address[]", "name": "attestees", "type": "address[]" } ], "internalType": "struct attestation", "name": "", "type": "tuple" } ], "stateMutability": "nonpayable", "type": "function" } ];
+
+      const zero_addr="0x0000000000000000000000000000000000000000";
+      var provider, signer, repository_ro, repository_rw, attestation_ro, attestation_rw, local_tags, my_addr;
+      //poor man's html factory
+      ['h1','h2','h3','div','p','ul','li','button','a','table','thead','tbody','th','td','tr'].forEach((tag) => {
+        window[tag]=(attrs, content="") => {
+          return $('<'+tag+' />', attrs).append(content);
+        }
+      })
+
+      Zepto(function($){
+        $(document).on("click",'button', function(e) {e.target.id && button_actions[e.target.id].call(null,e)});
+        $(document).on("click",'button', function(e) {e.target.attributes["class"] && button_actions[e.target.attributes["class"].textContent].call(null,e)});
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        provider.send("eth_requestAccounts", []);
+        signer = provider.getSigner();
+        signer.getAddress().then(a => my_addr=a);
+        repository_ro=new ethers.Contract(repository_addr, repository_abi, provider);
+        repository_rw=new ethers.Contract(repository_addr, repository_abi, signer);
+        $('#mm_connect').hide();
+        $("#show_new_attestation").show();
+      })
+      const button_actions={
+        "show_new_attestation_struct": function(e) {
+          $("#new_attestation_struct_form").show();
+          $("#show_new_attestation_struct").hide();
+        },
+        "save_prop": function(e) {
+          var key=$("#prop_key")[0].value;
+          var val=$("#prop_val")[0].value;
+          if (key && val){
+            $("#prop_form").before(tr({"class":"prop"},[td({},key),td({},val),button({"class":"delete_prop"},"X"),button({"class":"edit_prop"},"Edit")]));
+            $("#prop_key")[0].value="";
+            $("#prop_val")[0].value="";
+            $("#prop_key")[0].disabled=false;
+            $("#prop_key").focus();
+            $('#save_attestation')[0].disabled=false;
+          }
+        },
+        "delete_prop": function(e) {
+          evt=e;$(e.target).parent('tr').remove();
+        },
+        "edit_prop": function(e) {
+          var p=$(e.target).parent('.prop');
+          $("#prop_key")[0].value=p.children()[0].innerHTML;
+          $("#prop_val")[0].value=p.children()[1].innerHTML;
+          $(e.target).parent('tr').remove();
+        },
+        "save_attestation": function(e) {
+          var props = $("#attestation_props tr.prop").reduce(function(acc, row) {
+            acc.push([
+              $(row).children()[0].innerHTML,
+              $(row).children()[1].innerHTML
+            ]);
+            return acc;
+          }, []);
+          repository_rw.create_attestation($('#handle')[0].value,props);
+          $("#new_attestation_form").hide();
+          $("#show_new_attestation").show();
+        },
+        "show_attestations_about_me": function(e){
+          $("#attestations").empty();
+          $("#attestations").append(h3({},"attestations about: "+my_addr));
+        },
+        "show_attestations_by_me": function(e){},
+        "show_available_attestations": function(e){},
+
+    }
+    </script>
+  </head>
+  <body>
+    <h1>Attestation Management</h1>
+    <button id="show_new_attestation_struct">New Attestation Structure</button>
+    <button id="show_attestations_about_me">Attestations About Me</button>
+    <button id="show_attestations_by_me">Attestations By Me</button>
+    <button id="show_available_attestations">Available Attestations</button>
+    <div id="new_attestation_struct_form" hidden="true">
+      <h3>New Attestation</h3>
+      <table id="attestation_props" border="1">
+        <thead><th>Name</th><th>Value</th><th></th></thead>
+
+        <tr id="prop_form"><td><input type="text" id="prop_key" /></td><td><input type="text" id="prop_val" /></td><td><button id="save_prop">Save</button></td></tr>
+      </table>
+      <!--<label for="tags">Tags(comma separated):</label><input type="text" id="tags" name="tags" /> -->
+      <label for="handle">Handle:</label><input type="text" id="handle" name="handle" />
+      <button id="save_attestation" disabled="true">Save</button>
+    </div>
+   <!--  <div id="existing_tags"></div> -->
+    <div id="attestations"></div>
+    <div id="attestation"> </div>
+    <div hidden="true" id="attest_sign">
+      <label for="target">Target: </label><input name="target" id="attestation_target" />
+      <button id="scan">Scan</button>
+      <button id="sign">Sign</button>
+      <video></video>
+    </div>
+  </body>
+</html>
+
