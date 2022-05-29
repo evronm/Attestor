@@ -16,6 +16,12 @@ struct attestation {
     address[] attestees;
 }
 
+struct attestation_instance {
+  string[] prop_values;
+  address[] attestors;
+  address[] attestees;
+}
+
 library Utils {
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
