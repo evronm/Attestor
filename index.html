@@ -90,7 +90,7 @@
     function show_attestations(ids){
       $("#attestations").append(ul({}, 
         ids.map((id) => {
-          return li({}, id+":"+local_attestations[id].handle);
+          return li({}, button({"class":"handle"},id+":"+local_attestations[id].handle));
         })
       ))
 
