@@ -11,7 +11,7 @@
       const repository_abi=[ { "inputs": [ { "internalType": "string", "name": "handle", "type": "string" }, { "internalType": "address", "name": "attestee", "type": "address" } ], "name": "attest", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "int256", "name": "idx", "type": "int256" }, { "internalType": "address", "name": "attestee", "type": "address" } ], "name": "attest", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "attestations", "outputs": [ { "components": [ { "internalType": "string", "name": "handle", "type": "string" }, { "components": [ { "internalType": "string", "name": "key", "type": "string" }, { "internalType": "string", "name": "val", "type": "string" } ], "internalType": "struct prop[]", "name": "props", "type": "tuple[]" }, { "internalType": "address[]", "name": "attestors", "type": "address[]" }, { "internalType": "address[]", "name": "attestees", "type": "address[]" } ], "internalType": "struct attestation[]", "name": "", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestee", "type": "address" } ], "name": "attestations_about", "outputs": [ { "internalType": "uint256[]", "name": "", "type": "uint256[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestor", "type": "address" } ], "name": "attestations_by", "outputs": [ { "internalType": "uint256[]", "name": "", "type": "uint256[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestee", "type": "address" }, { "internalType": "uint256", "name": "attestation_ind", "type": "uint256" } ], "name": "attestors_of", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "handle", "type": "string" }, { "components": [ { "internalType": "string", "name": "key", "type": "string" }, { "internalType": "string", "name": "val", "type": "string" } ], "internalType": "struct prop[]", "name": "props", "type": "tuple[]" } ], "name": "create_attestation", "outputs": [ { "components": [ { "internalType": "string", "name": "handle", "type": "string" }, { "components": [ { "internalType": "string", "name": "key", "type": "string" }, { "internalType": "string", "name": "val", "type": "string" } ], "internalType": "struct prop[]", "name": "props", "type": "tuple[]" }, { "internalType": "address[]", "name": "attestors", "type": "address[]" }, { "internalType": "address[]", "name": "attestees", "type": "address[]" } ], "internalType": "struct attestation", "name": "", "type": "tuple" } ], "stateMutability": "nonpayable", "type": "function" } ];
 
       const zero_addr="0x0000000000000000000000000000000000000000";
-      var provider, signer, repository_ro, repository_rw, attestation_ro, attestation_rw, local_tags, my_addr;
+      var provider, signer, repository_ro, repository_rw, attestation_ro, attestation_rw, my_addr, local_attestations;
       //poor man's html factory
       ['h1','h2','h3','div','p','ul','li','button','a','table','thead','tbody','th','td','tr'].forEach((tag) => {
         window[tag]=(attrs, content="") => {
@@ -27,6 +27,7 @@
         signer = provider.getSigner();
         signer.getAddress().then(a => my_addr=a);
         repository_ro=new ethers.Contract(repository_addr, repository_abi, provider);
+        repository_ro.attestations().then(a => local_attestations=a);
         repository_rw=new ethers.Contract(repository_addr, repository_abi, signer);
         $('#mm_connect').hide();
         $("#show_new_attestation").show();
@@ -72,9 +73,26 @@
         "show_attestations_about_me": function(e){
           $("#attestations").empty();
           $("#attestations").append(h3({},"attestations about: "+my_addr));
+          repository_ro.attestations_about(my_addr).then((ids) => {show_attestations(ids) });
         },
-        "show_attestations_by_me": function(e){},
-        "show_available_attestations": function(e){},
+        "show_attestations_by_me": function(e){
+          $("#attestations").empty();
+          $("#attestations").append(h3({},"attestations by: "+my_addr));
+          repository_ro.attestations_by(my_addr).then((ids) => {show_attestations(ids) });
+
+        },
+        "show_available_attestations": function(e){
+          $("#attestations").empty();
+          $("#attestations").append(h3({},"Available Attestations "));
+          show_attestations(Array.from(local_attestations, (foo,i) => i))
+        },
+    }
+    function show_attestations(ids){
+      $("#attestations").append(ul({}, 
+        ids.map((id) => {
+          return li({}, id+":"+local_attestations[id].handle);
+        })
+      ))
 
     }
     </script>
