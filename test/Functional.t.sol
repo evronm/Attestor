@@ -42,22 +42,30 @@ contract AttestationStructureTest is Test {
   }
 
   function testSigs() public {
+    createTestStructures(5, 3);
+    assertEq(5,factory.handles().length);
+    assertEq(3, AttestationStructure(factory.attestation_structures("handle1")).prop_names().length);
 
   }
 
   function createTestStructures(uint num, uint num_props) private {
-    string memory bi;
-    string memory bj;
     for (uint i=1;i <= num; i++) {
       delete foo;
-      bi=["1","2","3","4","5","6","7","8"][i-1];
       for (uint j=1; j<=num_props;j++) {
-        bj=["1","2","3","4","5"][j-1];
-        foo.push(string.concat("propname",bi,bj));
+        foo.push(string.concat("propname",str_num(i),str_num(j)));
       }
-      factory.create_attestation_structure(string.concat("handle", bi), foo);
+      factory.create_attestation_structure(string.concat("handle", str_num(i)), foo);
     }
-
+  }
+  function createTestInstances(string memory handle,uint idx, uint num) private {
+    s=AttestationStructure(factory.attestation_structures(handle));
+    delete foo;
+    for (uint i=1;i <= s.prop_names().length; i++) {
+      foo[i-1]=string.concat("val", str_num(i));
+    }
+  }
+  function str_num(uint i) private returns (string memory) {
+    return ["1","2","3","4","5","6","7","8","9"][i-1];
   }
 
 }
