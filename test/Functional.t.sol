@@ -45,6 +45,8 @@ contract AttestationStructureTest is Test {
     createTestStructures(5, 3);
     assertEq(5,factory.handles().length);
     assertEq(3, AttestationStructure(factory.attestation_structures("handle1")).prop_names().length);
+    createTestInstances("handle1", 4);
+    assertEq(4, AttestationStructure(factory.attestation_structures("handle1")).instances().length);
 
   }
 
@@ -57,14 +59,17 @@ contract AttestationStructureTest is Test {
       factory.create_attestation_structure(string.concat("handle", str_num(i)), foo);
     }
   }
-  function createTestInstances(string memory handle,uint idx, uint num) private {
+  function createTestInstances(string memory handle, uint num) private {
     s=AttestationStructure(factory.attestation_structures(handle));
     delete foo;
     for (uint i=1;i <= s.prop_names().length; i++) {
-      foo[i-1]=string.concat("val", str_num(i));
+      foo.push(string.concat("val", str_num(i)));
+    }
+    for (uint i=1;i <= num; i++) {
+      s.new_instance(foo);
     }
   }
-  function str_num(uint i) private returns (string memory) {
+  function str_num(uint i) private view returns (string memory) {
     return ["1","2","3","4","5","6","7","8","9"][i-1];
   }
 
