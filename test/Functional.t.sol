@@ -41,12 +41,15 @@ contract AttestationStructureTest is Test {
     assert(Utils.compareStrings("place2", s.instances()[2].prop_values[2]));
   }
 
-  function testSigs() public {
+  function testAttestations() public {
     createTestStructures(5, 3);
     assertEq(5,factory.handles().length);
     assertEq(3, AttestationStructure(factory.attestation_structures("handle1")).prop_names().length);
     createTestInstances("handle1", 4);
     assertEq(4, AttestationStructure(factory.attestation_structures("handle1")).instances().length);
+    assert(Utils.compareStrings("val3",AttestationStructure(factory.attestation_structures("handle1")).instances()[3].prop_values[2]));
+    assert(Utils.compareStrings("val1",AttestationStructure(factory.attestation_structures("handle1")).instances()[0].prop_values[0]));
+    createTestAttestations("handle1", 20, 5);
 
   }
 
@@ -59,7 +62,7 @@ contract AttestationStructureTest is Test {
       factory.create_attestation_structure(string.concat("handle", str_num(i)), foo);
     }
   }
-  function createTestInstances(string memory handle, uint num) private {
+  function createTestInstances(string memory handle, uint num) private { //Don't love this; all the instances have the same values.  Might go through the shit of adding an instance #
     s=AttestationStructure(factory.attestation_structures(handle));
     delete foo;
     for (uint i=1;i <= s.prop_names().length; i++) {
@@ -69,7 +72,19 @@ contract AttestationStructureTest is Test {
       s.new_instance(foo);
     }
   }
-  function str_num(uint i) private view returns (string memory) {
+
+  function createTestAttestations(string memory handle,uint attestor, uint num_attestees) private {
+    s=AttestationStructure(factory.attestation_structures(handle));
+    vm.startPrank(address(uint160(attestor)));
+    for (uint i=0; i < s.instances().length;i++) {
+      for(uint j=0; j<num_attestees;j++) {
+        s.attest(int(i), address(uint160(j)));
+      }
+
+    }
+  }
+
+  function str_num(uint i) private pure returns (string memory) {
     return ["1","2","3","4","5","6","7","8","9"][i-1];
   }
 
