@@ -12,7 +12,7 @@
       const attestatation_struct_abi=[ { "inputs": [ { "internalType": "address", "name": "", "type": "address" } ], "name": "_num_attestations_about", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "", "type": "address" } ], "name": "_num_attestations_by", "outputs": [ { "internalType": "uint256", "name": "", "type": "uint256" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "int256", "name": "idx", "type": "int256" }, { "internalType": "address", "name": "attestee", "type": "address" } ], "name": "attest", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestee", "type": "address" } ], "name": "attestations_about", "outputs": [ { "internalType": "uint256[]", "name": "", "type": "uint256[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestor", "type": "address" } ], "name": "attestations_by", "outputs": [ { "internalType": "uint256[]", "name": "", "type": "uint256[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "address", "name": "attestee", "type": "address" }, { "internalType": "uint256", "name": "attestation_ind", "type": "uint256" } ], "name": "attestors_of", "outputs": [ { "internalType": "address[]", "name": "", "type": "address[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "string", "name": "handle", "type": "string" }, { "internalType": "string[]", "name": "prop_names", "type": "string[]" } ], "name": "init", "outputs": [ { "internalType": "contract AttestationStructure", "name": "", "type": "address" } ], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "instances", "outputs": [ { "components": [ { "internalType": "string[]", "name": "prop_values", "type": "string[]" }, { "internalType": "address[]", "name": "attestors", "type": "address[]" }, { "internalType": "address[]", "name": "attestees", "type": "address[]" } ], "internalType": "struct attestation_instance[]", "name": "", "type": "tuple[]" } ], "stateMutability": "view", "type": "function" }, { "inputs": [ { "internalType": "string[]", "name": "vals", "type": "string[]" } ], "name": "new_instance", "outputs": [], "stateMutability": "nonpayable", "type": "function" }, { "inputs": [], "name": "prop_names", "outputs": [ { "internalType": "string[]", "name": "", "type": "string[]" } ], "stateMutability": "view", "type": "function" } ];
 
       const zero_addr="0x0000000000000000000000000000000000000000";
-      var provider, signer, factory_ro, factory_rw, attestation_ro, attestation_rw, my_addr, local_attestations;
+      var provider, signer, factory_ro, factory_rw, attestation_ro, attestation_rw, my_addr, local_handles;
       //poor man's html factory
       ['h1','h2','h3','div','p','ul','li','button','a','table','thead','tbody','th','td','tr'].forEach((tag) => {
         window[tag]=(attrs, content="") => {
@@ -28,8 +28,8 @@
         signer = provider.getSigner();
         signer.getAddress().then(a => my_addr=a);
         factory_ro=new ethers.Contract(factory_addr, factory_abi, provider);
-        factory_ro.attestations().then(a => local_attestations=a);
         factory_rw=new ethers.Contract(factory_addr, factory_abi, signer);
+        show_handles();
         $('#mm_connect').hide();
         $("#show_new_attestation_struct").show();
       })
@@ -39,51 +39,47 @@
           $("#show_new_attestation_struct").hide();
         },
         "save_attestation_struct": function(e) {
-          var props = $("#attestation_props tr.prop").reduce(function(acc, row) {
-            acc.push([
-              $(row).children()[0].innerHTML,
-              $(row).children()[1].innerHTML
-            ]);
-            return acc;
-          }, []);
-          factory_rw.create_attestation($('#handle')[0].value,props);
-          $("#new_attestation_form").hide();
-          $("#show_new_attestation").show();
+          factory_rw.create_attestation_structure($('#handle')[0].value,$("#props")[0].value.split("|").map(h => h.trim())).then(
+            function() {
+              show_handles();
+              $("#new_attestation_struct_form").hide();
+              $("#show_new_attestation").show();
+            }
+          );
+        },
+        "handle": function(e) {
+          
+        },
+        "scan": function(e) {
+          var qr_reader=new QrScanner($('video')[0], function(result) {$("#attestation_target")[0].value=result; qr_reader.stop()});
+          qr_reader.start();
         },
     }
-    function show_attestations(ids){
-      $("#attestations").append(ul({}, 
-        ids.map((id) => {
-          return li({}, button({"class":"handle"},id+":"+local_attestations[id].handle));
+    function show_handles(){
+      factory_ro.handles().then(a => {
+      local_handles=a;
+      $("#handles").empty();
+      $("#handles").append(h2({},"Existing Attestation Structures"));
+      $("#handles").append(ul({}, 
+        local_handles.map((h) => {
+          return li({}, button({"class":"handle"},h));
         })
-      ))
+      )) });
 
     }
     </script>
   </head>
   <body>
+    <video></video>
     <h1>Attestation Management</h1>
     <button id="show_new_attestation_struct">New Attestation Structure</button>
     <div id="new_attestation_struct_form" hidden="true">
       <h3>New Attestation Structure</h3>
-      <table id="attestation_props" border="1">
-        <thead><th>Name</th><th>Value</th><th></th></thead>
-
-        <tr id="prop_form"><td><input type="text" id="prop_key" /></td><td><input type="text" id="prop_val" /></td><td><button id="save_prop">Save</button></td></tr>
-      </table>
-      <!--<label for="tags">Tags(comma separated):</label><input type="text" id="tags" name="tags" /> -->
+      <label for="tags">Property Names (pipe separated):</label><input type="text" id="props" name="props" />
       <label for="handle">Handle:</label><input type="text" id="handle" name="handle" />
-      <button id="save_attestation" disabled="true">Save</button>
+      <button id="save_attestation_struct">Save</button>
     </div>
-   <!--  <div id="existing_tags"></div> -->
-    <div id="attestations"></div>
-    <div id="attestation"> </div>
-    <div hidden="true" id="attest_sign">
-      <label for="target">Target: </label><input name="target" id="attestation_target" />
-      <button id="scan">Scan</button>
-      <button id="sign">Sign</button>
-      <video></video>
-    </div>
+    <div id="handles"></div>
   </body>
 </html>
 
