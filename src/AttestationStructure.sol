@@ -12,8 +12,8 @@ contract AttestationStructure is Initializable {
 
   mapping (address => mapping(uint => address[])) private _attestations_about;
   mapping (address => mapping(uint => address[])) private _attestations_by;
-  mapping (address => uint) private _num_attestations_about;
-  mapping (address => uint) private _num_attestations_by;
+  mapping (address => uint) public _num_attestations_about;
+  mapping (address => uint) public _num_attestations_by;
 
   function init(string memory handle,string[] memory prop_names) public initializer returns (AttestationStructure){
     _handle=handle;

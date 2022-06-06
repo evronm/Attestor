@@ -14,10 +14,10 @@ contract Factory is Initializable {
 
   function create_attestation_structure(string calldata handle,string[] calldata props) public returns (AttestationStructure) {
     require (! (attestation_structures[handle] > address(0)), "An Attestaion structure with this handle already exists");
-    AttestationStructure al=AttestationStructure(Clones.clone(base_attestation)).init(handle,props);
-    attestation_structures[handle]=address(al);
+    AttestationStructure s=AttestationStructure(Clones.clone(base_attestation)).init(handle,props);
+    attestation_structures[handle]=address(s);
     _handles.push(handle);
-    return al;
+    return s;
   }
 
   function handles() public view returns (string[] memory) {return _handles;}

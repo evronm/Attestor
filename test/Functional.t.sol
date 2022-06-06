@@ -50,7 +50,8 @@ contract AttestationStructureTest is Test {
     assert(Utils.compareStrings("val3",AttestationStructure(factory.attestation_structures("handle1")).instances()[3].prop_values[2]));
     assert(Utils.compareStrings("val1",AttestationStructure(factory.attestation_structures("handle1")).instances()[0].prop_values[0]));
     createTestAttestations("handle1", 20, 5);
-
+    assertEq(20,att_by_handle("handle1").attestations_by(address(20)).length);
+    assertEq(4,att_by_handle("handle1").attestations_about(address(4)).length);
   }
 
   function createTestStructures(uint num, uint num_props) private {
@@ -77,11 +78,14 @@ contract AttestationStructureTest is Test {
     s=AttestationStructure(factory.attestation_structures(handle));
     vm.startPrank(address(uint160(attestor)));
     for (uint i=0; i < s.instances().length;i++) {
-      for(uint j=0; j<num_attestees;j++) {
-        s.attest(int(i), address(uint160(j)));
+      for(uint160 j=0; j<num_attestees;j++) {
+        s.attest(int(i), address(j));
       }
 
     }
+  }
+  function att_by_handle(string memory handle) private view returns (AttestationStructure) {
+    return AttestationStructure(factory.attestation_structures(handle));
   }
 
   function str_num(uint i) private pure returns (string memory) {
