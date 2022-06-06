@@ -60,6 +60,9 @@ contract AttestationStructureTest is Test {
     assertEq(8,att_by_handle("handle1").attestations_about(address(0)).length);
     assertEq(8,att_by_handle("handle1").attestations_about(address(2)).length);
     assertEq(4,att_by_handle("handle1").attestations_about(address(4)).length);
+    
+    assertEq(address(20), att_by_handle("handle1").attestors_of(address(0), 0)[0]);
+    assertEq(address(30), att_by_handle("handle1").attestors_of(address(0), 0)[1]);
   }
 
   function createTestStructures(uint num, uint num_props) private {
