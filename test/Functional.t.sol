@@ -51,6 +51,14 @@ contract AttestationStructureTest is Test {
     assert(Utils.compareStrings("val1",AttestationStructure(factory.attestation_structures("handle1")).instances()[0].prop_values[0]));
     createTestAttestations("handle1", 20, 5);
     assertEq(20,att_by_handle("handle1").attestations_by(address(20)).length);
+    assertEq(20,att_by_handle("handle1")._num_attestations_by(address(20)));
+    assertEq(4,att_by_handle("handle1").attestations_about(address(0)).length);
+    assertEq(4,att_by_handle("handle1").attestations_about(address(4)).length);
+    createTestAttestations("handle1", 30, 3);
+    assertEq(12,att_by_handle("handle1").attestations_by(address(30)).length);
+    assertEq(12,att_by_handle("handle1")._num_attestations_by(address(30)));
+    assertEq(8,att_by_handle("handle1").attestations_about(address(0)).length);
+    assertEq(8,att_by_handle("handle1").attestations_about(address(2)).length);
     assertEq(4,att_by_handle("handle1").attestations_about(address(4)).length);
   }
 
@@ -83,6 +91,7 @@ contract AttestationStructureTest is Test {
       }
 
     }
+    vm.stopPrank();
   }
   function att_by_handle(string memory handle) private view returns (AttestationStructure) {
     return AttestationStructure(factory.attestation_structures(handle));
