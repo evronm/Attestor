@@ -22,7 +22,7 @@
 
       Zepto(function($){
         $(document).on("click",'button', function(e) {e.target.id && button_actions[e.target.id].call(null,e)});
-        $(document).on("click",'button', function(e) {e.target.attributes["class"] && button_actions[e.target.attributes["class"].textContent].call(null,e)});
+        $(document).on("click",'button', function(e) {e.target.attributes["class"] && button_actions[e.target.attributes["class"].textContent.split(' ')[0]].call(null,e)});
         provider = new ethers.providers.Web3Provider(window.ethereum);
         provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
@@ -48,7 +48,15 @@
           );
         },
         "handle": function(e) {
-          show_instances(e.target);
+          $(e.target).toggleClass('active');
+          if (e.target.className.match('active')) {
+            show_instances(e.target);
+          } else {
+            $(e.target).parent().children('.instances').hide();
+          }
+        },
+        "save_instance": function(e) {
+          $(e.target).parents('li').children('button')[0].contract_rw.new_instance(Array.from($(e.target).parents(".instance_form").find('input').map((i, j) => j.value)));
         },
         "scan": function(e) {
           var qr_reader=new QrScanner($('video')[0], function(result) {$("#attestation_target")[0].value=result; qr_reader.stop()});
@@ -63,26 +71,31 @@
       $("#handles").append(ul({}, local_handles.map(h => li({}, button({"class":"handle"},h)))))});
     }
     function show_instances(target) {
-      factory_ro.attestation_structures(target.textContent).then( 
-      addr =>new ethers.Contract(addr, attestatation_struct_abi, provider)).then(
-      att_struct => {att_struct.prop_names().then(
-        names => $(target).parent().append(
-          h3({},"Instances"),
-          table({},
-            thead({},names.map(name => th({},name))),
-            tbody()
-          )
-        )
-        ); return att_struct;
-        }
-        ).then(
-          att_struct => att_struct.instances().then(
-            instances => $(target).parent().find('tbody').append(
-              instances.map(instance => tr({}, instance.prop_values.map(val => td({},val)))),
-              tr({},$(target).parent().find('th').map(col => td({}, input()))) //one for each header
+      if ($(target).parent().children('.instances').length > 0) {
+        $(target).parent().children('.instances').show()
+      } else {
+        factory_ro.attestation_structures(target.textContent).then( 
+        addr =>new ethers.Contract(addr, attestatation_struct_abi, provider)).then(
+        att_struct => {
+          target.contract=att_struct;
+          target.contract_rw=new ethers.Contract(att_struct.address, attestatation_struct_abi, signer);
+          att_struct.prop_names().then(
+          names => $(target).parent().append(
+            div({"class":"instances"},h3({},"Instances"),
+            table({},
+              thead({},names.map(name => th({},name))).append(td({},"Actions")),
+              tbody()
+            )
+          ))); return att_struct;
+        }).then(
+            att_struct => att_struct.instances().then(
+              instances => $(target).parent().find('tbody').append(
+                instances.map(instance => tr({}, instance.prop_values.map(val => td({},val)))),
+                tr({"class":"instance_form"},$(target).parent().find('th').map(col => td({}, input()))).append(td({},button({"class":"save_instance"}, "Save New Instance"))) //one for each header
+              )
             )
           )
-        )
+        }
       }
     </script>
   </head>
