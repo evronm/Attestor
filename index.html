@@ -14,9 +14,9 @@
       const zero_addr="0x0000000000000000000000000000000000000000";
       var provider, signer, factory_ro, factory_rw, attestation_ro, attestation_rw, my_addr, local_handles;
       //poor man's html factory
-      ['h1','h2','h3','div','p','ul','li','button','a','table','thead','tbody','th','td','tr'].forEach((tag) => {
-        window[tag]=(attrs, content="") => {
-          return $('<'+tag+' />', attrs).append(content);
+      ['h1','h2','h3','div','p','ul','li','input','button','a','table','thead','tbody','th','td','tr'].forEach((tag) => {
+        window[tag]=(attrs, ...content) => {
+          return $('<'+tag+' />', attrs).append(content.flat());
         }
       })
 
@@ -48,7 +48,7 @@
           );
         },
         "handle": function(e) {
-          
+          show_instances(e.target);
         },
         "scan": function(e) {
           var qr_reader=new QrScanner($('video')[0], function(result) {$("#attestation_target")[0].value=result; qr_reader.stop()});
@@ -60,13 +60,30 @@
       local_handles=a;
       $("#handles").empty();
       $("#handles").append(h2({},"Existing Attestation Structures"));
-      $("#handles").append(ul({}, 
-        local_handles.map((h) => {
-          return li({}, button({"class":"handle"},h));
-        })
-      )) });
-
+      $("#handles").append(ul({}, local_handles.map(h => li({}, button({"class":"handle"},h)))))});
     }
+    function show_instances(target) {
+      factory_ro.attestation_structures(target.textContent).then( 
+      addr =>new ethers.Contract(addr, attestatation_struct_abi, provider)).then(
+      att_struct => {att_struct.prop_names().then(
+        names => $(target).parent().append(
+          h3({},"Instances"),
+          table({},
+            thead({},names.map(name => th({},name))),
+            tbody()
+          )
+        )
+        ); return att_struct;
+        }
+        ).then(
+          att_struct => att_struct.instances().then(
+            instances => $(target).parent().find('tbody').append(
+              instances.map(instance => tr({}, instance.prop_values.map(val => td({},val)))),
+              tr({},$(target).parent().find('th').map(col => td({}, input()))) //one for each header
+            )
+          )
+        )
+      }
     </script>
   </head>
   <body>
