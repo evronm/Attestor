@@ -22,7 +22,7 @@
 
       Zepto(function($){
         $(document).on("click",'button', function(e) {e.target.id && button_actions[e.target.id].call(null,e)});
-        $(document).on("click",'button', function(e) {e.target.attributes["class"] && button_actions[e.target.attributes["class"].textContent.split(' ')[0]].call(null,e)});
+        $(document).on("click",'button', function(e) {e.target.attributes["class"] && button_actions[e.target.attributes["class"].textContent.split(' ')[0]] && button_actions[e.target.attributes["class"].textContent.split(' ')[0]].call(null,e)});
         provider = new ethers.providers.Web3Provider(window.ethereum);
         provider.send("eth_requestAccounts", []);
         signer = provider.getSigner();
@@ -56,7 +56,7 @@
           }
         },
         "save_instance": function(e) {
-          $(e.target).parents('li').children('button')[0].contract_rw.new_instance(Array.from($(e.target).parents(".instance_form").find('input').map((i, j) => j.value)));
+          att_contract_rw(e).new_instance(Array.from($(e.target).parents(".instance_form").find('input').map((i, j) => j.value)));
         },
         "request_attestation": function(e) {
 
@@ -65,23 +65,30 @@
 
         },
         "address_input": function(e) { // buttons with this class all require an address input, and their second class name contains the function to call with the acquired address
-          var addr_form=div({"class":"addr_form"},input(),button({"class":"scan"},"Scan"), button({"class":"call_addr_action"}, "Apply"));
-          $(e.target).after(addr_form);
+          $("#call_addr_action").removeClass().addClass(e.target.classList[1]);
+          $(e.target).after($("#address_input").show());
         },
         "call_addr_action":function(e){
-
+          address_actions[e.target.className].call(null, e);
+          $("#address_input").hide();
         },
         "scan": function(e) {
-          var qr_reader=new QrScanner($('video')[0], function(result) {$("#attestation_target")[0].value=result; qr_reader.stop()});
+          var qr_reader=new QrScanner($('video')[0], function(result) {$("#address")[0].value=result; qr_reader.stop()});
           qr_reader.start();
         },
     }
     const address_actions={
-        "attestations_about": function(e) {},
-        "attestations_by": function(e) {},
-        "attest": function(e) {},
+        "attestations_about": function(e) {console.log("1")},
+        "attestations_by": function(e) {console.log("2")},
+        "attest": function(e) {
+          if (e.target.value > "") {
+
+          }
+        },
 
     }
+    function att_contract(e) {return $(e.target).parents('li').children('.handle')[0].contract;}
+    function att_contract_rw(e) {return $(e.target).parents('li').children('.handle')[0].contract_rw;}
     function show_handles(){
       factory_ro.handles().then(a => {
       local_handles=a;
@@ -109,7 +116,7 @@
         }).then(
             att_struct => att_struct.instances().then(
               instances => $(target).parent().find('tbody').append(
-                instances.map(instance => tr({}, instance.prop_values.map(val => td({},val))).append(td({},button({"class":"address_input show_attestations"}, "Show Attestations"),button({"class":"address_input attest"}, "Attest"),button({"class":"address_input request_attestion"}, "Request Attestation")))),
+                instances.map((instance,i) => tr({"id":att_struct.address + "-" + i}, instance.prop_values.map(val => td({},val))).append(td({},button({"class":"address_input show_attestations"}, "Show Attestations"),button({"class":"address_input attest"}, "Attest"),button({"class":"address_input request_attestion"}, "Request Attestation")))),
                 tr({"class":"instance_form"},$(target).parent().find('th').map(col => td({}, input()))).append(td({},button({"class":"save_instance"}, "Save New Instance"))) //one for each header
               )
             )
@@ -119,14 +126,19 @@
     </script>
   </head>
   <body>
-    <video></video>
     <h1>Attestation Management</h1>
     <button id="show_new_attestation_struct">New Attestation Structure</button>
     <div id="new_attestation_struct_form" hidden="true">
       <h3>New Attestation Structure</h3>
-      <label for="tags">Property Names (pipe separated):</label><input type="text" id="props" name="props" />
+      <label for="props">Property Names (pipe separated):</label><input type="text" id="props" name="props" />
       <label for="handle">Handle:</label><input type="text" id="handle" name="handle" />
       <button id="save_attestation_struct">Save</button>
+    </div>
+    <div id="address_input" hidden="true">
+      <label for="address">Address:</label><input type="text" id="address" name="address" />
+      <video></video>
+      <button id="scan">Scan</button>
+      <button id="call_addr_action">OK</button>
     </div>
     <div id="handles"></div>
   </body>
