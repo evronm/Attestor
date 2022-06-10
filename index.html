@@ -58,10 +58,29 @@
         "save_instance": function(e) {
           $(e.target).parents('li').children('button')[0].contract_rw.new_instance(Array.from($(e.target).parents(".instance_form").find('input').map((i, j) => j.value)));
         },
+        "request_attestation": function(e) {
+
+        },
+        "show_attestations": function(e) {
+
+        },
+        "address_input": function(e) { // buttons with this class all require an address input, and their second class name contains the function to call with the acquired address
+          var addr_form=div({"class":"addr_form"},input(),button({"class":"scan"},"Scan"), button({"class":"call_addr_action"}, "Apply"));
+          $(e.target).after(addr_form);
+        },
+        "call_addr_action":function(e){
+
+        },
         "scan": function(e) {
           var qr_reader=new QrScanner($('video')[0], function(result) {$("#attestation_target")[0].value=result; qr_reader.stop()});
           qr_reader.start();
         },
+    }
+    const address_actions={
+        "attestations_about": function(e) {},
+        "attestations_by": function(e) {},
+        "attest": function(e) {},
+
     }
     function show_handles(){
       factory_ro.handles().then(a => {
@@ -81,7 +100,7 @@
           target.contract_rw=new ethers.Contract(att_struct.address, attestatation_struct_abi, signer);
           att_struct.prop_names().then(
           names => $(target).parent().append(
-            div({"class":"instances"},h3({},"Instances"),
+            div({"class":"instances"},h3({},"Instances"),button({"class":"address_input attestations_about"}, "Attestations About..."),button({"class":"address_input attestations_by"}, "Attestations By..."),
             table({},
               thead({},names.map(name => th({},name))).append(td({},"Actions")),
               tbody()
@@ -90,7 +109,7 @@
         }).then(
             att_struct => att_struct.instances().then(
               instances => $(target).parent().find('tbody').append(
-                instances.map(instance => tr({}, instance.prop_values.map(val => td({},val)))),
+                instances.map(instance => tr({}, instance.prop_values.map(val => td({},val))).append(td({},button({"class":"address_input show_attestations"}, "Show Attestations"),button({"class":"address_input attest"}, "Attest"),button({"class":"address_input request_attestion"}, "Request Attestation")))),
                 tr({"class":"instance_form"},$(target).parent().find('th').map(col => td({}, input()))).append(td({},button({"class":"save_instance"}, "Save New Instance"))) //one for each header
               )
             )
