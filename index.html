@@ -69,7 +69,7 @@
           $(e.target).after($("#address_input").show());
         },
         "call_addr_action":function(e){
-          address_actions[e.target.className].call(null, e);
+          if ($("#address")[0].value > "") { address_actions[e.target.className].call(null, e); }
           $("#address_input").hide();
         },
         "scan": function(e) {
@@ -81,9 +81,7 @@
         "attestations_about": function(e) {console.log("1")},
         "attestations_by": function(e) {console.log("2")},
         "attest": function(e) {
-          if (e.target.value > "") {
-
-          }
+          att_contract_rw(e).attest($(e.target).parents('tr').attr("instance_ind"),$("#address")[0].value);
         },
 
     }
@@ -116,7 +114,7 @@
         }).then(
             att_struct => att_struct.instances().then(
               instances => $(target).parent().find('tbody').append(
-                instances.map((instance,i) => tr({"id":att_struct.address + "-" + i}, instance.prop_values.map(val => td({},val))).append(td({},button({"class":"address_input show_attestations"}, "Show Attestations"),button({"class":"address_input attest"}, "Attest"),button({"class":"address_input request_attestion"}, "Request Attestation")))),
+                instances.map((instance,i) => tr({"instance_ind": i}, instance.prop_values.map(val => td({},val))).append(td({},button({"class":"address_input show_attestations"}, "Show Attestations"),button({"class":"address_input attest"}, "Attest"),button({"class":"address_input request_attestion"}, "Request Attestation")))),
                 tr({"class":"instance_form"},$(target).parent().find('th').map(col => td({}, input()))).append(td({},button({"class":"save_instance"}, "Save New Instance"))) //one for each header
               )
             )
