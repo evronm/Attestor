@@ -41,9 +41,7 @@ contract AttestationStructure is Initializable {
 
   //getters
   function prop_names() public view returns (string[] memory) { return _prop_names; }
-  function instances() public view returns (attestation_instance[] memory) {
-    return _instances;
-  }
+  function instances() public view returns (attestation_instance[] memory) { return _instances; }
 
   function attestors_of(address attestee, uint attestation_ind) public view returns (address[] memory) { return _attestations_about[attestee][attestation_ind]; }
   function attestations_about(address attestee) public view returns (uint[] memory) {
