@@ -5,16 +5,6 @@ struct prop {
   string key;
   string val;
 }
-struct tag {
-  string tag;
-  string[] names;
-}
-struct attestation {
-    string handle;
-    prop[] props;
-    address[] attestors;
-    address[] attestees;
-}
 
 struct attestation_instance {
   string[] prop_values;
@@ -22,6 +12,12 @@ struct attestation_instance {
   address[] attestees;
 }
 
+struct reward_formula {
+  uint struct_ind;
+  string prop_name;
+  string prop_value;
+  uint tokens;
+}
 library Utils {
   function compareStrings(string memory a, string memory b) public pure returns (bool) {
     return keccak256(abi.encodePacked(a)) == keccak256(abi.encodePacked(b));
@@ -34,33 +30,4 @@ library Utils {
       }
       return -1;
   }
-}
-
-/*library Props {    //Not using it right now, but I think it will come in handy at some point
-  function get_index_from_key(prop[] memory props, string memory key) internal pure returns (int) {
-    for (uint i=0;i < props.length; i++) {
-      if ( Utils.compareStrings(props[i].key, key)) {
-        return int(i);
-      }
-    }
-    return -1;
-  }
-  function get_val_from_key(prop[] memory props, string memory key) public pure returns (string memory) {
-    int i=get_index_from_key(props, key);
-    require(i > -1);
-    return props[uint(i)].val;
-  }
-
-}*/
-
-library Attestations {
-  function get_index_from_handle(attestation[] memory attestations, string memory handle) internal pure returns (int) {
-    for (uint i=0;i < attestations.length; i++) {
-      if ( Utils.compareStrings(attestations[i].handle, handle)) {
-        return int(i);
-      }
-    }
-    return -1;
-  }
-    
 }
