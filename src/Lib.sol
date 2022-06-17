@@ -13,6 +13,7 @@ struct attestation_instance {
 }
 
 struct reward_formula {
+  address struct_addr;
   uint struct_ind;
   string prop_name;
   string prop_value;
