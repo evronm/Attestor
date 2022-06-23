@@ -22,6 +22,9 @@
       })
 
       Zepto(function($){
+        const params = new Proxy(new URLSearchParams(window.location.search), {
+          get: (searchParams, prop) => searchParams.get(prop),
+        });
         $(document).on("click",'button', function(e) {e.target.id && button_actions[e.target.id].call(null,e)});
         $(document).on("click",'button', function(e) {e.target.attributes["class"] && button_actions[e.target.attributes["class"].textContent.split(' ')[0]] && button_actions[e.target.attributes["class"].textContent.split(' ')[0]].call(null,e)});
         provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -30,9 +33,10 @@
         signer.getAddress().then(a => my_addr=a);
         factory_ro=new ethers.Contract(factory_addr, factory_abi, provider);
         factory_rw=new ethers.Contract(factory_addr, factory_abi, signer);
-        show_handles();
-        $('#mm_connect').hide();
-        $("#show_new_attestation_struct").show();
+        factory_ro.handles().then(a => {
+          local_handles=a;
+          show_handles(params.handle, params.instance_ind, params.attestee_addr);
+        })
       })
       const button_actions={
         "show_new_attestation_struct": function(e) {
@@ -88,12 +92,11 @@
     }
     function att_contract(e) {return $(e.target).parents('li').children('.handle')[0].contract;}
     function att_contract_rw(e) {return $(e.target).parents('li').children('.handle')[0].contract_rw;}
-    function show_handles(){
-      factory_ro.handles().then(a => {
-      local_handles=a;
+    function show_handles(handle, instance_ind, attestee_addr){
       $("#handles").empty();
       $("#handles").append(h2({},"Existing Attestation Structures"));
-      $("#handles").append(ul({}, local_handles.map(h => li({}, button({"class":"handle"},h)))))});
+      $("#handles").append(ul({}, local_handles.map(h => li({}, button({"class":"handle"},h)))));
+      if (handle) { $('.handle')[local_handles.findIndex(h => h == handle)].click();}
     }
     function show_instances(target) {
       if ($(target).parent().children('.instances').length > 0) {
