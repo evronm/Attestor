@@ -96,9 +96,9 @@
       $("#handles").empty();
       $("#handles").append(h2({},"Existing Attestation Structures"));
       $("#handles").append(ul({}, local_handles.map(h => li({}, button({"class":"handle"},h)))));
-      if (handle) { $('.handle')[local_handles.findIndex(h => h == handle)].click();}
+      if (handle) {show_instances($('.handle')[local_handles.findIndex(h => h == handle)], instance_ind, attestee_addr);}
     }
-    function show_instances(target) {
+    function show_instances(target, instance_ind, attestee_addr) {
       if ($(target).parent().children('.instances').length > 0) {
         $(target).parent().children('.instances').show()
       } else {
@@ -122,7 +122,7 @@
                 tr({"class":"instance_form"},$(target).parent().find('th').map(col => td({}, input()))).append(td({},button({"class":"save_instance"}, "Save New Instance"))) //one for each header
               )
             )
-          )
+          ).then(() => {if (attestee_addr) {$('.attest')[instance_ind].click();$("#address")[0].value=attestee_addr; }})
         }
       }
     </script>
