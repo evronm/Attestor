@@ -22,20 +22,20 @@ In order to explain how all this works, we'll need to start with some rigorous(i
 - **Attestation** - A statement made by the owner of a wallet about the owner of another wallet (it can actually be the same wallet, but those won't count for much).  **These cannot be transferred**.
 - **Structured Attestation** - As the name implies, an attestation with named fields.  
 - **Attestation Structure** - A set of field names to be used for structured attestations
-- **Attestation Structure Instance** - An attestation structure with values for its fields
+- **Attestation Structure Instance** - An attestation structure with values for its fields.  When "making a structured attestation," a wallet holder is actually signing an attestation structure instance.
 - **Reward Formula** - This is a formula used to issue reward tokens based on attestations made.  This transform function should be run on a regular basis.  The reward period, and all reward formulas should be subject to change via voting events.
 
 For those of you in the audience counting, yes, there are two different token types referenced above, plus structured attestations, which aren't really tokens but if you squint hard enough they kind of look like semi-fungible tokenoids.
 
-I love coding and hate writing, so rather than crank out a(nother motherfucking) whitepaper (no offense to whitepaper writers; I respect your people), I hope the following sequence descriptions will suffice to illustrate, at least at a very high level, the major functions of a Market DAO.  
+I love coding and hate writing (thoguh I confess it's a lot less painful when you don't have to worry about whether or not some asshole VC will fund your project), so rather than crank out a(nother lousy) whitepaper (no offense to whitepaper writers; I respect your people), I hope the following sequence descriptions will suffice to illustrate, at least at a high level, the major functions of a Market DAO.  
 
 # Event Sequences in the DAO
 
 ## DAO Creation
 
-- A random wallet creates and deploys Factory Contract
+- A random wallet (a.k.a "sonebody") creates and deploys Factory Contract.  Some parametets should be set at this point (including min/max voting/market period) but there is no exhaustive list yet.
 - The Factory Contract deploys a multi-asset wallet contract, which it owns.
-  - The reason the factory contract currently owns the wallet is that it will need to reassign ownership to a voting contract.  There should be no code in the factory contract that alters the wallet in any other way (Gah!  probaly; it may make more sense to have the factory create a new wallet for each voting event).
+  - The reason the factory contract currently owns the wallet is that it will need to reassign ownership to a voting contract.  There should be no code in the factory contract that alters the wallet in any other way (Gah!  probaly; it may make more sense to have the factory create a new wallet for each voting event involving a funds transfer).
 
 ## Attestation Structure Creation
 
@@ -48,7 +48,7 @@ I love coding and hate writing, so rather than crank out a(nother motherfucking)
 
 - A specific Attestation Structure Contract creates an instance of itself, consisting of values for its fields
   - Like the structures themselves, structure instances can be created by anyone but once created are immutable.
-  - There should probably be functionality here to delete these things as long as no attestations have been made.
+  - There should probably be functionality here to delete these things as long as no attestations have been made.  Maybe also for Attestation Structures without instances.
 
 ## Attestation Creation
 
@@ -57,10 +57,13 @@ I love coding and hate writing, so rather than crank out a(nother motherfucking)
   - The plan for the moment is that these cannot be deleted, but of course that can change and allows for variations.
 
 ## Reward Formula Vote Proposal Process
-**TODO** However: Voting proposals cannot be a free for all.  That would be an enormous headache.  Some idea to limit proposals (this could be a setting, and could even be changeable by a voting event):
+**TODO** However: Voting proposals cannot be a free for all.  That would be an enormous headache.  Some ideas to limit proposals (this could be a setting, and could even be changeable by a voting event):
   - Only wallets with more than X tokens can propose a vote.
   - Voting proposals require at least X tokens worht of "support"; functionality would need to be built for this.
   - Voting proposals require support from at least X wallets, each of which contains at least Y tokens.
+  - Voting proposals require some kind of bounty which passes into the vault if proposal fails.
+
+Also, it occurs to me that a DSL for reward formula description might be called for here.  Sadly, the Geneva convention forbids writing parsers in Solidity.  Then again, fuck 'em!
 
 
 ## Treasury transfer Vote Proposal Process
@@ -69,14 +72,14 @@ I love coding and hate writing, so rather than crank out a(nother motherfucking)
 
 ## Reward Award (Periodic and Non-interactive)
 - Rewards contract iterates through all active rewards formulas
-  - For each formula, it iterates through all the relevant attestations (each reward formula must reference at least one attestation structure instance) and mints the appropriate number of tokens to each attestee
+  - For each formula, it iterates through all the relevant attestations (each reward formula must reference at least one attestation structure instance) and mints the appropriate number of tokens to each attestee (maybe attestor as well).
 
 ## Voting Event
 - At the moment, I only have two types of voting events in mind:
   - Reward formula changes
   - Transfers out of the vault
 - The procedure seems to me like it should be the same:
-  - Proposal made and approved for voting (procedure TBD)
+  - Proposal made and approved for voting (procedure TBD as per above)
     - Proposals should include a voting/market period. with a minimum and maximum TBD at creation time.
   - One Voting token is issued for every permanent token in every wallet that holds them.
   - Voting token holders are now free to vote, sell their voting tokens, or do nothing.
