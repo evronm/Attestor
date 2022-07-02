@@ -15,12 +15,10 @@ The DAO itself is based on two principles:
 
 In order to explain how all this works, we'll need to start with some rigorous(ish) definitions, as the terms standard English offers are confusingly nebulous.
 
-Market Dao starts with of "soul-bound" attestations, used periodically to produce fungible reward tokens.  These tokens, in turn emit expiring voting tokens for each voting event.  I'll try to explain a bit more below.  Let's start with some definitions, as standard English terms can be quite confusing in these matters:
-
 - **Voting Event** -  An event in which token holders vote
 - **Voting Token** - An expiring token good for one vote at one voting event.  Burned at vote date if unused.
 - **Permanent Token** - Non expiring reward tokens.  They can represent any value desired, but initially their primary pupose is to emit voting tokens when a voting event is called.
-- **Attestation** - A statement made by the owner of a wallet about the owner of another wallet (it can actually be the same wallet, but those won't count for much).
+- **Attestation** - A statement made by the owner of a wallet about the owner of another wallet (it can actually be the same wallet, but those won't count for much).  **These cannot be transferred**.
 - **Structured Attestation** - As the name implies, an attestation with named fields.  
 - **Attestation Structure** - A set of field names to be used for structured attestations
 - **Attestation Structure Instance** - An attestation structure with values for its fields
