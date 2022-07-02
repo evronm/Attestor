@@ -1,12 +1,13 @@
 # Market DAO
 
-*I fear that if a well designed free market can't defeat Moloch, nothing can and we're all fucked.*
 
-*Which is to say, "we're all fucked."*
+*I fear that if a well designed free market can't defeat [Moloch](https://slatestarcodex.com/2014/07/30/meditations-on-moloch/), nothing can and we're all fucked.*
 
-*May as well go down fighting, though.  If nothing else, it's more fun than the alternative.*
+*Which is to say, "I fear we're all fucked."*
 
-Market DAO is my idea of how we go down fighting.
+*That said, May as well go down fighting.  If nothing else, it's more fun than the alternative.*
+
+Market DAO is my idea of how we go down fighting.  I really think this thing can be tuned to provide incentives appropriate to the betterment of humanity and its environs.  Well, at least it's worth a shot...
 
 The DAO itself is based on two principles:
 
