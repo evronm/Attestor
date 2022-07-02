@@ -64,6 +64,7 @@
           att_contract_rw(e).new_instance(Array.from($(e.target).parents(".instance_form").find('input').map((i, j) => j.value)));
         },
         "request_attestation": function(e) {
+          console.log(window.location.href.replace(/\?.+/,'')+"?handle="+$(e.target).parents('li').children('.handle').html().replace(' ',"+"))
 
         },
         "show_attestations": function(e) {
@@ -118,7 +119,7 @@
         }).then(
             att_struct => att_struct.instances().then(
               instances => $(target).parent().find('tbody').append(
-                instances.map((instance,i) => tr({"instance_ind": i, "attestors":instance.attestors, "attestees": instance.attestees}, instance.prop_values.map(val => td({},val))).append(td({},button({"class":"address_input show_attestations"}, "Show Attestations"),button({"class":"address_input attest"}, "Attest"),button({"class":"address_input request_attestion"}, "Request Attestation")))),
+                instances.map((instance,i) => tr({"instance_ind": i, "attestors":instance.attestors, "attestees": instance.attestees}, instance.prop_values.map(val => td({},val))).append(td({},button({"class":"show_attestations"}, "Show Attestations"),button({"class":"address_input attest"}, "Attest"),button({"class":"request_attestation"}, "Request Attestation")))),
                 tr({"class":"instance_form"},$(target).parent().find('th').map(col => td({}, input()))).append(td({},button({"class":"save_instance"}, "Save New Instance"))) //one for each header
               )
             )
