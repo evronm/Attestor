@@ -33,7 +33,7 @@ I love coding and hate writing (thoguh I confess it's a lot less painful when yo
 
 ## DAO Creation
 
-- A random wallet (a.k.a "sonebody") creates and deploys Factory Contract.  Some parametets should be set at this point (including min/max voting/market period) but there is no exhaustive list yet.
+- A random wallet (a.k.a "somebody") creates and deploys Factory Contract.  Some parametets should be set at this point (including min/max voting/market period) but there is no exhaustive list yet.
 - The Factory Contract deploys a multi-asset wallet contract, which it owns.
   - The reason the factory contract currently owns the wallet is that it will need to reassign ownership to a voting contract.  There should be no code in the factory contract that alters the wallet in any other way (Gah!  probaly; it may make more sense to have the factory create a new wallet for each voting event involving a funds transfer).
 
