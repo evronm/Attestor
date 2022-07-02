@@ -16,9 +16,9 @@ The DAO itself is based on two principles:
 
 In order to explain how all this works, we'll need to start with some rigorous(ish) definitions, as the terms standard English offers are confusingly nebulous.
 
-- **Voting Event** -  An event in which token holders vote
+- **Voting Event** -  An event in which token holders vote (ok, duh, but I need to distinguish it from the act of voting or the contents of a cast vote, or...)
 - **Voting Token** - An expiring token good for one vote at one voting event.  Burned at vote date if unused.
-- **Permanent Token** - Non expiring reward tokens.  They can represent any value desired, but initially their primary pupose is to emit voting tokens when a voting event is called.
+- **Permanent Token** - Non expiring reward tokens.  They can represent any value desired, but initially their primary pupose is to emit voting tokens when a voting event is called.  I'm not crazy about this name but it will have to do for now.
 - **Attestation** - A statement made by the owner of a wallet about the owner of another wallet (it can actually be the same wallet, but those won't count for much).  **These cannot be transferred**.
 - **Structured Attestation** - As the name implies, an attestation with named fields.  
 - **Attestation Structure** - A set of field names to be used for structured attestations
