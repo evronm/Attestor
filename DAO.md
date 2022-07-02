@@ -24,6 +24,10 @@ In order to explain how all this works, we'll need to start with some rigorous(i
 - **Attestation Structure Instance** - An attestation structure with values for its fields
 - **Reward Formula** - This is a formula used to issue reward tokens based on attestations made.  This transform function should be run on a regular basis.  The reward period, and all reward formulas should be subject to change via voting events.
 
+For those of you in the audience counting, yes, there are two different token types referenced above, plus structured attestations, which aren't really tokens but if you squint hard enough they kind of look like semi-fungible tokenoids.
+
+I love coding and hate writing, so rather than crank out a(nother motherfucking) whitepaper (no offense to whitepaper writers; I respect your people), I hope the following sequence descriptions will suffice to illustrate, at least at a very high level, the major functions of a Market DAO.  
+
 # Event Sequences in the DAO
 
 ## DAO Creation
@@ -62,9 +66,6 @@ In order to explain how all this works, we'll need to start with some rigorous(i
 **TODO** However:  Such proposals at minimum will need to include target address, asset types and amounts, and type and number of tokens expected.  
 - There is an opportunity here for a kill switch in that the proposal can stipulate sth like "if the proposal passes, the outbound transfer happens, and the expected inbound transfer does not, PANIC!" (provided that "PANIC!" is well defnied)
 
-## Reward Formula Vote Proposal Process
-**TODO**
-
 ## Reward Award (Periodic and Non-interactive)
 - Rewards contract iterates through all active rewards formulas
   - For each formula, it iterates through all the relevant attestations (each reward formula must reference at least one attestation structure instance) and mints the appropriate number of tokens to each attestee
@@ -84,3 +85,6 @@ In order to explain how all this works, we'll need to start with some rigorous(i
     - If the proposal does not pass, nothing happens.  As of now, there should be no state to revert, with the possible exception of deleting the proposal.
     - Regardless of which way the voting event goes, all tokens relating to it that have not already been burned are burned at this point having abstained.
 
+---
+
+I have in mind a play in three acts, entitled "DAOnton abbey" which would demonstrate how a market DAO could be used to run a chamber of commerce.  It will probably never get written, but maybe if I mention it here it will push me to actually do it while procrastinating coding.  
