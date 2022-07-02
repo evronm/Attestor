@@ -11,7 +11,7 @@ Market DAO is my idea of how we go down fighting.
 The DAO itself is based on two principles:
 
 - A system of structured attestations which is used periodically to produce rewards in the form of fungible tokens.
-- A merket based voting system.
+- A market based voting system.
 
 In order to explain how all this works, we'll need to start with some rigorous(ish) definitions, as the terms standard English offers are confusingly nebulous.
 
@@ -85,9 +85,4 @@ Market Dao starts with of "soul-bound" attestations, used periodically to produc
     - If the proposal passes, the funds are transferred in the case of a transfer voting event, or the reward formula is activated/deactivated in the event of a reward change voting event.
     - If the proposal does not pass, nothing happens.  As of now, there should be no state to revert, with the possible exception of deleting the proposal.
     - Regardless of which way the voting event goes, all tokens relating to it that have not already been burned are burned at this point having abstained.
-
-
-:w
-
-
 
