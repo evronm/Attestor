@@ -35,7 +35,7 @@ I love coding and hate writing (thoguh I confess it's a lot less painful when yo
 
 - A random wallet (a.k.a "somebody") creates and deploys Factory Contract.  Some parameters should be set at this point (including min/max voting/market period) but there is no exhaustive list yet.
 - The Factory Contract deploys a multi-asset wallet contract, which it owns.
-  - The reason the factory contract currently owns the wallet is that it will need to reassign ownership to a voting contract.  There should be no code in the factory contract that alters the wallet in any other way (Gah!  probaly; it may make more sense to have the factory create a new wallet for each voting event involving a funds transfer).
+  - The reason the factory contract currently owns the wallet is that it will need to reassign ownership to a voting contract.  There should be no code in the factory contract that alters the wallet in any other way (Gah!  probably; it may make more sense to have the factory create a new wallet for each voting event involving a funds transfer).
 
 ## Attestation Structure Creation
 
@@ -59,7 +59,7 @@ I love coding and hate writing (thoguh I confess it's a lot less painful when yo
 ## Reward Formula Vote Proposal Process
 **TODO** However: Voting proposals cannot be a free for all.  That would be an enormous headache.  Some ideas to limit proposals (this could be a setting, and could even be changeable by a voting event):
   - Only wallets with more than X tokens can propose a vote.
-  - Voting proposals require at least X tokens worht of "support"; functionality would need to be built for this.
+  - Voting proposals require at least X tokens worth of "support"; functionality would need to be built for this.
   - Voting proposals require support from at least X wallets, each of which contains at least Y tokens.
   - Voting proposals require some kind of bounty which passes into the vault if proposal fails.
 
